@@ -1,0 +1,235 @@
+#%RAML 0.8
+# @see http://raml.org/developers/raml-100-tutorial
+---
+title: resalloc API
+version: v1
+baseUri: /api/v1
+/resources:
+     /:
+       get:
+         description: List all resources that could be leased. Since resources are grouped by OS types, output is not paginated.
+         responses:
+           200:
+             body:
+               application/json:
+                 example: |
+                   {
+                       "meta": {
+                          "http_code": 200,
+                          "duration": 0.5156,
+                          "documentation": "http://localhost/resalloc/public/documentation/index.php?path=/resources"
+                       },
+                       "data": {
+                          "centos": [
+                             {
+                                "distro": "centos-7.1",
+                                "links": {
+                                   "lease": "/resources/centos-7.1/lease"
+                                }
+                             },
+                             {
+                                "distro": "centos-6.7",
+                                "links": {
+                                   "lease": "/resources/centos-6.7/lease"
+                                }
+                             },
+                             {
+                                "distro": "centos-5.10",
+                                "links": {
+                                   "lease": "/resources/centos-5.10/lease"
+                                }
+                             },
+                          ],
+                          "coreos": [
+                             {
+                                "distro": "coreos-845",
+                                "links": {
+                                   "lease": "/resources/coreos-845/lease"
+                                }
+                             },
+                             {
+                                "distro": "coreos-835",
+                                "links": {
+                                   "lease": "/resources/coreos-835/lease"
+                                }
+                             },
+                             {
+                                "distro": "coreos-766",
+                                "links": {
+                                   "lease": "/resources/coreos-766/lease"
+                                }
+                             }
+                          ]
+                       }
+                   }
+     /{searchString}:
+       get:
+         description: List resources matching the searchString.
+         responses:
+           200:
+             body:
+               application/json:
+                 example: |
+                   {
+                       "meta": {
+                          "http_code": 200,
+                          "duration": 0.0342,
+                          "documentation": "http://localhost/resalloc/public/documentation/index.php?path=/resources"
+                       },
+                       "data": {
+                          "centos": [
+                             {
+                                "distro": "centos-7.1",
+                                "links": {
+                                   "lease": "/resources/centos-7.1/lease"
+                                }
+                             }
+                          ]
+                       }
+                   }
+     /{searchString}/lease:
+       post:
+         description: Lease a single resource matching the search string. Will return an error if the search string is matching more than a single OS type. If searchString is matching a single OS type that however has multiple os versions available, the latest version will be used.
+         responses:
+           201:
+             body:
+               application/json:
+                 example: |
+                  {
+                      "meta": {
+                         "http_code": 201,
+                         "duration": 0.3861,
+                         "documentation": "http://localhost/resalloc/public/documentation/index.php?path=/resources/{searchString}/lease"
+                      },
+                      "data": {
+                         "leased_at": {
+                            "date": "2015-11-14 16:11:01.000000",
+                            "timezone_type": 3,
+                            "timezone": "America/Los_Angeles"
+                         },
+                         "links": {
+                            "rel": "details",
+                            "uri": "/leases/292c8e99-2378-55aa-83d8-350e0ac3f1cc"
+                         }
+                      }
+                  }
+/leases:
+     /:
+       get:
+         description: List all active leases for the authenticated user
+         responses:
+           200:
+             body:
+               application/json:
+                 example: |
+                     {
+                         "meta": {
+                            "http_code": 200,
+                            "duration": 0.8266,
+                            "documentation": "http://localhost/resalloc/public/documentation/index.php?path=/leases"
+                         },
+                         "data": [
+                            {
+                               "id": "7fef88f7-411d-5669-b42d-bf5fc7f9b58b",
+                               "distro": "ubuntu-12.04",
+                               "local_ip": "192.168.89.62",
+                               "credentials": "All leased resources are sharing your user credentials - use the same username & password",
+                               "expires_at": {
+                                  "date": "2015-11-14 17:27:45.000000",
+                                  "timezone_type": 3,
+                                  "timezone": "America/Los_Angeles"
+                               },
+                               "links": [
+                                  {
+                                     "rel": "self",
+                                     "uri": "/leases/7fef88f7-411d-5669-b42d-bf5fc7f9b58b"
+                                  },
+                                  {
+                                     "rel": "terminate",
+                                     "uri": "/leases/7fef88f7-411d-5669-b42d-bf5fc7f9b58b/terminate"
+                                  }
+                               ]
+                            },
+                            {
+                               "id": "d62149c8-71b3-5c0e-a3c8-acd70b6675a2",
+                               "distro": "ubuntu-15.10",
+                               "local_ip": "192.168.141.120",
+                               "credentials": "All leased resources are sharing your user credentials - use the same username & password",
+                               "expires_at": {
+                                  "date": "2015-11-14 16:27:45.000000",
+                                  "timezone_type": 3,
+                                  "timezone": "America/Los_Angeles"
+                               },
+                               "links": [
+                                  {
+                                     "rel": "self",
+                                     "uri": "/leases/d62149c8-71b3-5c0e-a3c8-acd70b6675a2"
+                                  },
+                                  {
+                                     "rel": "terminate",
+                                     "uri": "/leases/d62149c8-71b3-5c0e-a3c8-acd70b6675a2/terminate"
+                                  }
+                               ]
+                            }
+                         ]
+                     }
+
+
+     /{leaseId}:
+       get:
+         description: Provide lease details for the authenticate user, assuming that the lease is still active and belongs to the said user
+         responses:
+           200:
+             body:
+               application/json:
+                 example: |
+                  {
+                       "meta": {
+                         "http_code": 200,
+                         "duration": 0.8515,
+                         "documentation": "http://localhost/resalloc/public/documentation/index.php?path=/leases/{leaseId}"
+                       },
+                       "data": {
+                         "id": "7fef88f7-411d-5669-b42d-bf5fc7f9b58b",
+                         "distro": "ubuntu-12.04",
+                         "local_ip": "192.168.89.62",
+                         "credentials": "All leased resources are sharing your user credentials - use the same username & password",
+                         "expires_at": {
+                            "date": "2015-11-14 17:27:45.000000",
+                            "timezone_type": 3,
+                            "timezone": "America/Los_Angeles"
+                         },
+                         "links": [
+                            {
+                               "rel": "self",
+                               "uri": "/leases/7fef88f7-411d-5669-b42d-bf5fc7f9b58b"
+                            },
+                            {
+                               "rel": "terminate",
+                               "uri": "/leases/7fef88f7-411d-5669-b42d-bf5fc7f9b58b/terminate"
+                            }
+                         ]
+                      }
+                  }
+     /{leaseId}/terminate:
+       delete:
+         description: Terminate the lease, assuming that it is still active and belongs to the authenticated user
+         responses:
+           200:
+             body:
+               application/json:
+                 example: |
+                  {
+                      "meta": {
+                         "http_code": 200,
+                         "duration": 0.8152,
+                         "documentation": "http://localhost/resalloc/public/documentation/index.php?path=/leases/{leaseId}/terminate"
+                      },
+                      "data": {
+                         "terminated_at": {
+                            "date": "2015-11-14 16:21:28.000000",
+                            "timezone_type": 3,
+                            "timezone": "America/Los_Angeles"
+                         }
+                      }
+                  }
